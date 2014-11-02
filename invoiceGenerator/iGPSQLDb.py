@@ -13,6 +13,7 @@ import psycopg2
 import sys
 
 class PostgreSQLDb(object):
+    con = None
     def __init__(self, host, database, user, pw):
         self.host = host
         self.dbName = database
@@ -30,7 +31,7 @@ class PostgreSQLDb(object):
             result = cur.fetchall()
 
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Get Stores, Error: %s" % e.args[0]
             print(out)
             sys.exit(1)
 
@@ -50,7 +51,7 @@ class PostgreSQLDb(object):
             result = cur.fetchall()
             con.close()
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Get Clients, Error: %s" % e.args[0]
             print(out)
             sys.exit(1)
         finally:
@@ -69,7 +70,7 @@ class PostgreSQLDb(object):
             result = cur.fetchall()
 
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Get Company, Error: %s" % e.args[0]
             print(out)
             sys.exit(1)
 
@@ -90,7 +91,7 @@ class PostgreSQLDb(object):
             result = cur.fetchall()
 
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Get LineItems, Error: %s" % e.args[0]
             print(out)
             sys.exit(1)
 
@@ -106,7 +107,9 @@ class PostgreSQLDb(object):
         con = None
 
         try:
+            # print("self.host:", self.host, "self.dbName:", self.dbName, "self.dbUser:",self.dbUser, "self.password:", self.password)
             con = psycopg2.connect(host=self.host, dbname=self.dbName, user=self.dbUser, password=self.password)
+            #con = psycopg2.connect(dbname=self.dbName, user=self.dbUser, password=self.password)
             cur = con.cursor()
 
             # invoices
@@ -119,14 +122,14 @@ class PostgreSQLDb(object):
             if con:
                 con.rollback()
 
-            print('Error - DatabaseError')
+            print('Get Invoice, Error: DatabaseError')
             sys.exit(1)
 
         except IOError:
             if con:
                 con.rollback()
 
-            print('Error - IOError')
+            print('Get Invoice, Error: IOError')
             sys.exit(1)
 
         finally:
@@ -147,7 +150,7 @@ class PostgreSQLDb(object):
             con.commit()
             print("Client inserted")
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Insert Client, Error: %s" % e.args[0]
             print(out)
 
     def insertStore(self, storeId, companyId, storeName, storeManager, addressLine1, addressLine2, storeTelNo):
@@ -163,7 +166,7 @@ class PostgreSQLDb(object):
             con.close()
             print("Store inserted")
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Insert Store, Error: %s" % e.args[0]
             print(out)
 
     def insertCompany(self, companyId, bankName, branchCode, taxNo, customerNo):
@@ -179,7 +182,7 @@ class PostgreSQLDb(object):
             con.close()
             print("Company inserted")
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Insert Company, Error: %s" % e.args[0]
             print(out)
 
     def insertInvoice(self, invoiceNo, version, invoiceDate, invoiceNote, companyId, clientId, timestamp):
@@ -194,7 +197,7 @@ class PostgreSQLDb(object):
             con.commit()
             print("Invoice inserted")
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Insert Invoice, Error: %s" % e.args[0]
             print(out)
 
     def insertLineItems(self, invoiceNo, version, lineItemId, quantity, description, \
@@ -211,16 +214,28 @@ class PostgreSQLDb(object):
             con.close()
             print("Line item inserted")
         except psycopg2.Error as e:
-            out = "Error: %s" % e.args[0]
+            out = "Insert LineItems, Error: %s" % e.args[0]
             print(out)
+
+    def connect(self):
+        try:
+            con = psycopg2.connect(host=self.host, dbname=self.dbName, user=self.dbUser, password=self.password)
+        except psycopg2.Error as e:
+            out = "Insert LineItems, Error: %s" % e.args[0]
+            print(out)
+        return con
+
+    # def disconnect(self):
+    #     if con:
+    #         con.close()
 
 
 # add host value to psycopg2.connect()
+host = '127.0.0.1'
 database_name = 'Roland Richter'
 user_name = 'rolandrichter'
 userpw = 'mamamia'
-host = '127.0.0.1'
 
 if __name__ == "__main__":
-    postgreSQLDb = PostgreSQLDb(database_name, user_name, userpw, host)
+    postgreSQLDb = PostgreSQLDb(host, database_name, user_name, userpw)
     postgreSQLDb.getInvoices()

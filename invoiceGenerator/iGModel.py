@@ -1,38 +1,19 @@
 from iGDb import SQLiteDb
-from iGInvoice import Invoice
-from iGClient import Client
+from iGObjects import Invoice, LineItem, Company, Client, Store
 
 #from any_other_files import other_classes
-from decimal import *
 import datetime
     
-
-HTMLTOP = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+HTMLTOP = """
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
     <title>
       A title
     </title>
-    <script>
-    function updateStore1() {{
-        htmlControls.updateStore1();
-    }}
-    function updateStore2() {{
-        var result = htmlControls.updateStore2();
-    }}
-    function updateClient() {{
-        var result = htmlControls.updateClient();
-    }}
-    function updateLineItems() {{
-        var result = htmlControls.updateLineItems();
-    }}
-    function updateCompany() {{
-        var result = htmlControls.updateCompany();
-    }}
-    </script>
   </head>
 
-  <body style="width: 1000px; height: 1414px; border: solid; margin-left:80px; margin-right: 80px; margin-bottom: 10px;margin-top: 20px; font-family: Gill Sans, sans-serif; font-size: 11pt;">
+  <body style="width: 1000px; height: 1414px; border: solid; margin-left:10px; margin-right: 10px; margin-bottom: 10px;margin-top: 10px; font-family: Gill Sans, sans-serif; font-size: 11pt;">
 
     <div style="width:1000px; height: 220px; position:absolute; float: left; font-family: Gill Sans, sans-serif; font-size: 11pt;">
 
@@ -45,28 +26,28 @@ HTMLTOP = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
       </div>
 
       <div style="width:333px; height: 220px; top: 15px; position: relative;float: left;">
-          <div onclick="htmlControls.updateStore1()">
+          <div onclick="controller.displayStore1Dialog()">
             <!-- Store 1 details-->
-            {0}G&auml;rtnerei Roland Richter<br>
-            {1}Inh. A. Clau&szlig;nitzer<br>
-            {2}Oppacher Stra&szlig;e 22<br>
-            {3}02689 Sohland OT Wehrsdorf<br>
-            {4}Tel. 035936 / 30434
+            {0}<br>
+            {1}<br>
+            {2}<br>
+            {3}<br>
+            Tel. {4}
           </div>
-          <div onclick="updateStore2()">
+          <div onclick="controller.displayStore2Dialog()">
             <p>
               <!-- Store 2 details-->
-              {5}Blumeneck Roland Richter<br>
-              {6}Inh. A. Clau&szlig;nitzer<br>
-	      {7}Dresdner Stra&szlig;e 5<br>
-              {8}02681 Wilthen<br>
-              {9}Tel. 03592 / 33045
+              {5}<br>
+              {6}<br>
+	          {7}<br>
+              {8}<br>
+              Tel. {9}
             </p>
           </div>
       </div>
     </div>
 
-    <div onclick="updateClient()" style="width:1000px;position:absolute; top: 260px; left: 160px;">
+    <div onclick="controller.displayClientDialog()" style="width:577px;position:absolute; top: 260px; left: 90px;">
       <table>
         <tr>
           <td width="100%">
@@ -76,33 +57,32 @@ HTMLTOP = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
         <tr>
           <td>
             <br>
-            {10}Client X<br>
-            {11}Name Y<br>
-            {12}Street Z<br><br>
-            {13}Postcode Place
+            {10}<br>
+            {11}<br>
+            {12}<br>
+            {13}
           </td>
         </tr>
       </table>
     </div>
 
-    <div style="width:1000px; position:absolute; top: 450px; left: 160px;">
+    <div style="width:850px; position:absolute; top: 450px; left: 90px;">
       <table style="width:800px;">
       <!-- Invoice details-->
       <tr>
         <td width="587px">
-          <span style="font-weight: bold; font-size: 16pt"> {14}Invoice</span> 1/2014
+          <span style="font-weight: bold; font-size: 16pt">Invoice {14}</span>
         </td>
         <td>
-          {15}Invoice date: dd/mm/yyyy
+          Invoice date: {15}
         </td>
 
       </tr>
       </table>
     </div>
-
-    <div onclick="updateLineItems()" style="width:850px; position:absolute; top: 475px; left: 160px;">
+    <div onclick="controller.displayLineItemsDialog()" style="width:850px; position:absolute; top: 475px; left: 90px;">
       <table width="100%">
-        <!-- Item headers-->
+        <! -- Item headers-->
         <tr>
           <td colspan="6">
             <hr>
@@ -110,7 +90,7 @@ HTMLTOP = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
         </tr>
         <tr>
           <td colspan="6">
-            {16}I delivered to you on date dd/mm/yy:
+            I delivered to you on date {16}:
           </td>
         </tr>
         <tr>
@@ -133,7 +113,7 @@ HTMLTOP = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
             Total
           </td>
         </tr>
-        <!-- Item details-- loops until all line items displayed>"""
+        <! -- Item details-- loops until all line items displayed>"""
 
 HTMLMIDDLE ="""
         <tr>
@@ -146,8 +126,8 @@ HTMLMIDDLE ="""
           <td>
             {2}
           </td>
-          <td align="right">
-            {3}
+          <td>
+            {3}%
           </td>
           <td>
             {4}
@@ -158,7 +138,7 @@ HTMLMIDDLE ="""
         </tr>"""
 
 HTMLBOTTOM = """
-        <!-- Total-->
+        <! -- Total-->
         <tr>
           <td align="right" colspan="5"></td>
           <td>
@@ -193,9 +173,9 @@ HTMLBOTTOM = """
         </tr>
       </table>
     </div>
-    <div onclick="updateCompany()" style="width:850px;position:absolute; top: 1300px; left: 160px;">
+    <div onclick="controller.displayCompanyDialog()" style="width:850px;position:absolute; top: 1300px; left: 90px;">
       <table width="100%">
-        <!-- Company bank details-->
+        <! -- Company bank details-->
         <tr>
           <td colspan="2">
             <hr>
@@ -221,17 +201,14 @@ HTMLBOTTOM = """
 class Model(object):
     def __init__(self):
         # initialise database data
+        print("Model.__init__")
         self.SQLiteDb = SQLiteDb()
         
         # initials variables from database - tuples
         # http://stackoverflow.com/questions/16296643/convert-tuple-to-list-and-back
 
-        # initialise previous Invoices
-        self.dbClients = self.getDbClients()
-        self.dbInvoices = self.getDbInvoices()
-        self.dbLineItems = self.getDbLineItems()
-        self.dbCompany = self.getDbCompany()
-        self.dbStores = self.getDbStores()
+        # initialise variables from local database
+        self.loadDbVariables()
 
         # initialise previous invoices
         # {invNo: Invoice()}
@@ -248,69 +225,65 @@ class Model(object):
         self.sortByOptions = self.getSortByOptions()
         
         
+    def loadDbVariables(self):
+        self.dbClients = self.getDbClients()
+        self.dbInvoices = self.getDbInvoices()
+        self.dbLineItems = self.getDbLineItems()
+        self.dbCompany = self.getDbCompany()
+        self.dbStores = self.getDbStores()
+
     def initializePreviousInvoices(self):
+        print("  model.initializePreviousInvoices")
         # does not contain line item details. Line item details are keep
         # in line item dict
         invDict = {}
         
         for invoice in self.dbInvoices:
-            company = self.getCompany(invoice[4])
             client = self.getClient(invoice[5])
-            store1 = self.getStore(invoice[6])
-            store2 = self.getStore(invoice[7])
-
+            company = self.getCompany(invoice[4])
+            # get list of stores with company id
+            stores = self.getStores(invoice[4])
+            store1 = stores[0]
+            store2 = stores[1]
             items = self.getLineItems(invoice[0],invoice[1])
-            
+
             invDict[invoice[0]] = \
-                Invoice(invoice[0], invoice[1], invoice[2], invoice[3], \
-                    invoice[6], store1[1], store1[2], store1[4], store1[5], store1[3], \
-                    invoice[7], store2[1], store2[2], store2[4], store2[5], store2[3],
-                    invoice[5], client[1], client[2], client[3], client[4], \
-                    items, company[2], company[3],
-                    invoice[4], company[4], company[5], invoice[7])
+                Invoice(invoice[0], invoice[1], invoice[2], invoice[3], client, items, company, store1, store2)
 
         return invDict
     
     # use most recent invoice saved as template without line item details
     def initializeCurrentInvoice(self):
         # lastInvoice = .... look at self.previousInvoices and use data from there
+        print("  model.initializeCurrentInvoice")
         lastInv = self.previousInvoices[self.getLastInvoiceNoUsed()]
+
         return Invoice(self.getNextInvoiceNo(), \
+            # version
             "1", \
+            # today's date
             self.getDate(), \
             # note
             "", \
-            lastInv.store1.storeId, \
-            lastInv.store1.name, \
-            lastInv.store1.manager, \
-            lastInv.store1.address1, \
-            lastInv.store1.address2, \
-            lastInv.store1.telNo, \
-            lastInv.store2.storeId, \
-            lastInv.store2.name, \
-            lastInv.store2.manager, \
-            lastInv.store2.address1, \
-            lastInv.store2.address2, \
-            lastInv.store2.telNo, \
             # client details
-            "","","","","", \
+            lastInv.client,
             # line items
             [], \
-            #company details
-            lastInv.company.companyId,
-            lastInv.company.bankName, \
-            lastInv.company.branchCode, \
-            lastInv.company.taxNo, \
-            lastInv.company.customerNo, \
-            self.getTimestamp)
+            # company
+            lastInv.company,
+            # stores
+            lastInv.store1,
+            lastInv.store2)
 
     def getNextInvoiceNo(self):
+        print("  model.getNextInvoiceNo")
         splitResult = self.getLastInvoiceNoUsed().split("/")
         invSeqNo = int(splitResult[0]) + 1
         
         return (str(invSeqNo) + '/' + splitResult[1])
 
     def getLastInvoiceNoUsed(self):
+        print("  model.getLastInvoiceNoUsed")
         invSeqNo = 0
         invYear = 0
         splitResult = []
@@ -328,49 +301,56 @@ class Model(object):
         return (str(invSeqNo) + '/' + str(invYear))
 
     def getPreviousInvoices(self):
+        print("  model.getPreviousInvoices")
         return self.previousInvoices
 
-    def getTimestamp(self):
-        now = datetime.datetime.now()
-        return datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-
     def getDate(self):
+        print("  model.getDate")
         now = datetime.datetime.now()
         return datetime.datetime.now().strftime("%d/%m/%Y")
 
     # get client list from sqlite db and updates list of clients var
     def getDbInvoices(self):
-        return self.SQLiteDb.getInvoices()
+        print("  model.getDbInvoices")
+        return self.SQLiteDb.getDbInvoices()
 
     def getDbLineItems(self):
-        return self.SQLiteDb.getLineItems()
+        print("  model.getDbLineItems")
+        return self.SQLiteDb.getDbLineItems()
 
     # get company details from sqlite db and updates company var
     def getDbCompany(self):
-        return self.SQLiteDb.getCompany()
+        print("  model.getDbCompany")
+        return self.SQLiteDb.getDbCompany()
 
     # gets stores' details from sqlite db and updates list of store vars
     def getDbStores(self):
-        return self.SQLiteDb.getStores()
+        print("  model.getDbStores")
+        return self.SQLiteDb.getDbStores()
 
     # get client list from sqlite db and updates list of clients vars
     def getDbClients(self):
-        return self.SQLiteDb.getClients()
+        print("  model.getDbClients")
+        return self.SQLiteDb.getDbClients()
     
 # sortBy functionality
     def getSortByOptions(self):
+        print("  model.getSortByOptions")
         return ['Invoice No', 'Date', 'Client']
 
     def getSelectedSortByOptions(self, index):
+        print("  model.getSelectedSortByOptions")
         return self.sortByOptions[index]
 
 
 ################
 
     def getInvoices(self):
+        print("  model.getInvoices")
         return self.invoices
 
     def getLineItems(self, invNo, version):
+        print("  model.getLineItems")
         items = []
         for lineItem in self.dbLineItems:
             if invNo == lineItem[0] and version == lineItem[1]:
@@ -379,86 +359,112 @@ class Model(object):
 
     # get client list from sqlite db and updates list of clients var
     def getCompany(self, companyId):
+        print("  model.getCompany")
         for company in self.dbCompany:
             if company[0] == companyId:
-                return company
-        return None
-    # get client list from sqlite db and updates list of clients var
-    def getStore(self, storeId):
-        for store in self.dbStores:
-            if store[0] == storeId:
-                return store
+                return Company(company[0], company[1],company[2],company[3],company[4])
         return None
 
     # get client list from sqlite db and updates list of clients var
+    def getStore(self, storeId):
+        print("  model.getStore")
+        for store in self.dbStores:
+            if store[0] == storeId:
+                return Store(store[0],store[1],store[2],store[3],store[4],store[5],store[6])
+        return None
+
+    # returns a list of stores with specified company id
+    def getStores(self, companyId):
+        print("  model.getStores")
+        stores = []
+        for store in self.dbStores:
+            if store[1] == companyId:
+                stores.append(Store(store[0],store[1],store[2],store[3],store[4],store[5],store[6]))
+        return stores
+
+    # returns client object with a specified id or None
     def getClient(self, clientId):
-        store = []
+        print("  model.getClient")
         for client in self.dbClients:
             if client[0] == clientId:
-                return list(client)
-        return []
+                return Client(client[0],client[1],client[2],client[3],client[4])
+        return None
     
 #################
 
     # return list of clients
     def getClients(self):
+        print("  model.getClients")
         return [list(i) for i in self.getDbClients()]
     
     # return list of clients names
     def getClientNames(self):
+        print("  model.getClientNames")
         clientNames = []
         for client in self.dbClients:
             clientNames.append(client[1])
         return clientNames
 
     def getSelectedClientsName(self, index):
+        print("  model.getSelectedClientsName")
         return self.clientNames[index]
 
     def getCurrentInvoiceNo(self):
+        print("  model.getCurrentInvoiceNo")
         return self.currentInvoice.invoiceNo
         
     def add_stuff(self, no):
+        print("  model.add_stuff")
         self.total = self.total + no
     
     def increment(self, value):
+        print("  model.increment")
         try:
             value = int(value) + 1
         except Exception:
-            print("Ahhh, shit")
+            print("  model.Ahhh, shit")
         return value
 
     def getTotal(self):
+        print("  model.getTotal")
         return self.total
         
     def getCurrentInvoice(self):
+        print("  model.getCurrentInvoice")
         return self.currentInvoice
     
     def getPreviousInvoice(self, invNo):
+        print("  model.getPreviousInvoice")
         return self.previousInvoices[invNo]
         
 # preview
     def getPreviewCurrentInvoice(self):
+        print("  model.getPreviewCurrentInvoice")
         return self.getPreviewHTML(self.currentInvoice)
 
     def getDisplayedInvoiceNo(self):
+        print("  model.getDisplayedInvoiceNo")
         return self.displayedInvoiceNo
 
     def setDisplayedInvoiceNo(self, invoiceNo):
+        print("  model.setDisplayedInvoiceNo")
         self.displayedInvoiceNo = invoiceNo
 
 #
     def setCurrentInvoice(self, invoiceObject):
+        print("  model.setCurrentInvoice")
         self.currentInvoice = invoiceObject
 
 #
     def getPreviewPreviousInvoice(self, invoice):
+        print("  model.getPreviewPreviousInvoice")
         return self.getPreviewHTML(self.previousInvoices[invoice])
         
     def getPreviewHTML(self, invoice):
+        print("  model.getPreviewHTML")
     # name = "allen"
     # notName = "notAllen"
     # "{0} is my name and not {1} ".format(name, notName)
-        top = ""
         top = HTMLTOP.format( \
             invoice.store1.name, \
             invoice.store1.manager, \
@@ -470,7 +476,7 @@ class Model(object):
             invoice.store2.address1, \
             invoice.store2.address2, \
             invoice.store2.telNo, \
-            invoice.client.name, \
+            invoice.client.contactName, \
             invoice.client.businessName, \
             invoice.client.address1, \
             invoice.client.address2, \
@@ -487,12 +493,11 @@ class Model(object):
                     i.description, \
                     i.getPriceBeforeVat(), \
                     i.vatCategory, \
-                    i.getVat(), \
+                    i.getVatAmount(), \
                     i.getPriceAfterVat()
                     )
 
-            # calculate totals
-
+        # calculate totals
         bottom = HTMLBOTTOM.format( \
             invoice.getTotal(), \
             invoice.getTotal7Vat(), \
@@ -502,11 +507,12 @@ class Model(object):
             invoice.company.branchCode, \
             invoice.company.taxNo, \
             invoice.company.customerNo)
-
-        return (top + middle + bottom)
+        #print(top + middle + bottom)
+        return top + middle + bottom
 
     # e.g. {'test': ['1','2','3'],'test2': ['4','5','6']}
     def getInvoiceTreeList(self, sortBy):
+        print("  model.getInvoiceTreeList")
         # need to check what list is sorted by
         # if....
         #but for testing purposes we will use sort by date...
@@ -519,109 +525,224 @@ class Model(object):
             5. return dict
         
         """
+        # reload previousInvoices for new invoices
+        # self.previousInvoices = self.initializePreviousInvoices()
+
         result = {}
         # Invoice number
+        # {'114/14': [],'116/14': []}
         if sortBy == self.getSortByOptions()[0]:
             aList = []
-            for key in self.previousInvoices.keys():
+            for key in self.previousInvoices:
                 result[key] = aList
-        # Date
+
+        # Date {'24/07/2014': ['114/14','116/14'],'25/07/2014': ['118/14','119/14']}
         elif sortBy == self.getSortByOptions()[1]:
             for key in self.previousInvoices:
-                aList = []
-                if self.previousInvoices[key].date in result:
-                    tempList = result[key]
-                    tempList.append(key)
-                    result[self.previousInvoices[key].date] = tempList
-                else:
+                # if date is not in result dict, add it with value key
+                if not self.previousInvoices[key].date in result:
                     result[self.previousInvoices[key].date] = [key]
-        #Client
+                # if date is in result dict, add the key to the value list
+                else:
+                    invoiceList = result[self.previousInvoices[key].date]
+                    invoiceList.append(key)
+                    result[self.previousInvoices[key].date] = invoiceList
+
+        #Client {'Bob': ['114/14','116/14'],'Joe': ['118/14','119/14']}
         elif sortBy == self.getSortByOptions()[2]:
             for key in self.previousInvoices:
-                aList = []
-                if self.previousInvoices[key].client.name in result:
-                    tempList = result[key]
-                    tempList.append(key)
-                    result[self.previousInvoices[key].client.name] = tempList
+                if not self.previousInvoices[key].client.contactName in result:
+                    result[self.previousInvoices[key].client.contactName] = [key]
                 else:
-                    result[self.previousInvoices[key].client.name] = [key]
+                    clientList = result[self.previousInvoices[key].client.contactName]
+                    clientList.append(key)
+                    result[self.previousInvoices[key].client.contactName] = clientList
         return result
 
 # returns Client object
     def getClientObject(self, clientName):
+        print("  model.getClientObject")
         result = None
-        for client in self.SQLiteDb.getClients():
+        for client in self.dbClients:
+            # there are instances where client is changed but no value is selected
+            if clientName == "":
+                result = Client(client[0], client[1], client[2], client[3], \
+                    client[4])
+                break
             if client[1] == clientName:
                 result = Client(client[0], client[1], client[2], client[3], \
-                    client[4], client[5])
+                    client[4])#, client[5])
         return result
         
 # takes a Client object and set it as the current invoice client
     def setClient(self, client):
+        print("  model.setClient")
         self.currentInvoice.client = client
 
     def getInitialPreview(self):
+        print("  model.getInitialPreview")
         self.setCurrentInvoice(self.initializeCurrentInvoice())
         return self.getPreviewCurrentInvoice()
 
     def saveCurrentInvoice(self):
-        # # is current invoice already in db
-        # current invoice should have version number correct already
-        SQLiteDb.insertStore(self.currentInvoice.store1.storeId, \
-                          self.currentInvoice.store1.name, \
-                          self.currentInvoice.store1.manager, \
-                          self.currentInvoice.store1.address1, \
-                          self.currentInvoice.store1.address2, \
-                          self.currentInvoice.store1.telNo, \
-                          self.currentInvoice.store1.getTimestamp())
+        print("  model.saveCurrentInvoice")
+# http://www.tutorialspoint.com/python/python_loop_control.htm
 
-        SQLiteDb.insertStore(self.currentInvoice.store2.storeId, \
-                          self.currentInvoice.store2.name, \
-                          self.currentInvoice.store2.manager, \
-                          self.currentInvoice.store2.address1, \
-                          self.currentInvoice.store2.address2, \
-                          self.currentInvoice.store2.telNo, \
-                          self.currentInvoice.store2.getTimestamp())
+        # check stores for updates
+        # if there is a change to any of the stores then both stores need to be saved referencing a new company
+        # store 1
+        store1Id = None
+        store2Id = None
 
-# clientId, clientName, businessName, addressLine1, addressLine2, timestamp
-        SQLiteDb.insertClient(self.currentInvoice.client.clientId, \
-                              self.currentInvoice.client.name, \
-                              self.currentInvoice.client.businessName, \
-                              self.currentInvoice.client.address1, \
-                              self.currentInvoice.client.address2, \
-                              self.currentInvoice.client.getTimestamp())
+        # check for store_id in store table
+        for store in self.dbStores:
+            # we check all columns except id
+            if (store[1]==self.currentInvoice.store1.getCompanyId() and \
+                    store[2]==self.currentInvoice.store1.getName() and \
+                    store[3]==self.currentInvoice.store1.getManager() and \
+                    store[4]==self.currentInvoice.store1.getAddress1() and \
+                    store[5]==self.currentInvoice.store1.getAddress2() and \
+                    store[6]==self.currentInvoice.store1.getTelNo()):
+                print("Store1 found - not saved")
+                # and we get the primary key!
+                store1Id = store[0]
 
-# companyId, bankName, branchCode, taxNo, customerNo, timestamp
-        SQLiteDb.insertCompany(self.currentInvoice.company.companyId, \
-                               self.currentInvoice.company.bankName, \
-                               self.currentInvoice.company.branchCode, \
-                               self.currentInvoice.company.taxNo, \
-                               self.currentInvoice.company.customerNo, \
-                               self.currentInvoice.company.getTimestamp())
+            if (store[1]==self.currentInvoice.store2.getCompanyId() and \
+                    store[2]==self.currentInvoice.store2.getName() and \
+                    store[3]==self.currentInvoice.store2.getManager() and \
+                    store[4]==self.currentInvoice.store2.getAddress1() and \
+                    store[5]==self.currentInvoice.store2.getAddress2() and \
+                    store[6]==self.currentInvoice.store2.getTelNo()):
+                print("Store2 found - not saved")
+                # and we get the primary key!
+                store2Id = store[0]
 
-# invoiceId, version, invoiceDate, invoiceNote, companyId, clientId, store1Id, store2Id, timestamp
-        SQLiteDb.insertInvoice(self.currentInvoice.invoiceNo, \
-                               self.currentInvoice.version, \
-                               self.currentInvoice.date, \
-                               self.currentInvoice.note, \
-                               self.currentInvoice.company.companyId, \
-                               self.currentInvoice.client.clientId, \
-                               self.currentInvoice.store.storeId, \
-                               self.currentInvoice.store2.storeId, \
-                               self.currentInvoice.getTimestamp())
+        # if we don't find the primary key we insert a record
+        if store1Id is None or store2Id is None:
+            companyId = len(self.dbCompany) + 1
 
-# invoiceId, version, lineItemId, quantity, description, priceBeforeVat, vatCategory, vat, priceAfterVat, timestamp
-        for line in self.currentInvoice.lineItems:
-            SQLiteDb.insertLineItems(self.currentInvoice.invoiceNo, \
-                                     line.version, \
-                                     line.lineItemNo, \
-                                     line.quantity, \
-                                     line.description, \
-                                     line.getPriceBeforeVat(), \
-                                     line.getVatategory(), \
-                                     line.getPriceAfterVat(), \
-                                     line.getTimeStamp())
+            self.SQLiteDb.insertCompany(companyId, \
+                                self.currentInvoice.company.getBankName(), \
+                                self.currentInvoice.company.getBranchCode(), \
+                                self.currentInvoice.company.getTaxNo(), \
+                                self.currentInvoice.company.getCustomerNo())
 
+            #if store1Id is None:
+            store1Id = len(self.dbStores) + 1
+            #else:
+            #    store1Id = self.currentInvoice.store1.getStoreId()
+
+            self.SQLiteDb.insertStore(store1Id, \
+                                 companyId, \
+                                 self.currentInvoice.store1.getName(), \
+                                 self.currentInvoice.store1.getManager(), \
+                                 self.currentInvoice.store1.getAddress1(), \
+                                 self.currentInvoice.store1.getAddress2(), \
+                                 self.currentInvoice.store1.getTelNo())
+
+            # we need to refresh the dbStores list for store2
+            self.dbStores = self.getDbStores()
+
+        # store 2
+            #if store2Id is None:
+            store2Id = len(self.dbStores) + 1
+            #else:
+            #    store2Id = self.currentInvoice.store2.getStoreId()
+
+            self.SQLiteDb.insertStore(store2Id, \
+                                 companyId, \
+                                 self.currentInvoice.store2.getName(), \
+                                 self.currentInvoice.store2.getManager(), \
+                                 self.currentInvoice.store2.getAddress1(), \
+                                 self.currentInvoice.store2.getAddress2(), \
+                                 self.currentInvoice.store2.getTelNo())
+
+        # if both stores are found then check the company details for changes
+        else:
+            # company
+            companyId = None
+
+            for company in self.dbCompany:
+                # if the exact record is not found then we consider
+                # the current invoice contains a update to a previous company
+                if ( company[1]==self.currentInvoice.company.getBankName() and \
+                        company[2]==self.currentInvoice.company.getBranchCode() and \
+                        company[3]==self.currentInvoice.company.getTaxNo() and \
+                        company[4]==self.currentInvoice.company.getCustomerNo()):
+                    # company found
+                    companyId = company[0] # primary key
+                    print("company found - not saved")
+                    break
+
+            if companyId is None: # not found then insert record into client table
+                companyId = len(self.dbCompany) + 1
+                self.SQLiteDb.insertCompany(companyId, \
+                                    self.currentInvoice.company.getBankName(), \
+                                    self.currentInvoice.company.getBranchCode(), \
+                                    self.currentInvoice.company.getTaxNo(), \
+                                    self.currentInvoice.company.getCustomerNo())
+
+
+        # client
+        # check client for updates
+        clientId = None
+        for client in self.dbClients:
+            # check to see if client contact name exists
+            # if the exact record is not found then we consider
+            # the current invoice contains a update to a previous client or
+            # a new client
+            if (client[1]==self.currentInvoice.client.getContactName() and \
+                    client[2]==self.currentInvoice.client.getBusinessName() and \
+                    client[3]==self.currentInvoice.client.getAddress1() and \
+                    client[4]==self.currentInvoice.client.getAddress2()):
+                # client found
+                # check rest of record, if different then create version 2 of client with different values
+                clientId = client[0] # primary key
+                print("client found - not saved")
+                break
+
+        if clientId is None: # not found then insert record into client table
+            clientId = len(self.dbClients) + 1
+            self.SQLiteDb.insertClient(clientId, \
+                                 self.currentInvoice.client.getContactName(), \
+                                 self.currentInvoice.client.getBusinessName(), \
+                                 self.currentInvoice.client.getAddress1(), \
+                                 self.currentInvoice.client.getAddress2())
+
+        # invoice
+        self.currentInvoice.setVersion(int(1))
+        for inv in self.dbInvoices:
+            # inv[0] all invoices no.
+            if (self.currentInvoice.getInvoiceNo()==inv[0]):
+                # increment version
+                self.currentInvoice.setVersion(int(self.currentInvoice.getVersion()) + 1)
+                print('invoice found - incrementing version')
+
+        self.SQLiteDb.insertInvoice(self.currentInvoice.getInvoiceNo(), \
+                               self.currentInvoice.getVersion(), \
+                               self.currentInvoice.getDate(), \
+                               self.currentInvoice.getNote(), \
+                               companyId, \
+                               clientId, \
+                               self.getTimestamp())
+
+        # line items
+        lineItemNo = 0
+        for li in self.currentInvoice.getLineItems():
+            lineItemNo += 1
+            self.SQLiteDb.insertLineItems(self.currentInvoice.getInvoiceNo(), \
+                                          self.currentInvoice.getVersion(), \
+                                          lineItemNo, li.getQuantity(), \
+                                          li.getDescription(), li.getPriceBeforeVat(), \
+                                          li.getVatCategory(), li.getVatAmount(), \
+                                          li.getPriceAfterVat())
+
+        print("Finished insert")
+
+    def getTimestamp(self):
+        print("  model.getTimestamp")
+        now = datetime.datetime.now()
+        return datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
 
 if __name__ == "__main__":
     aModel = Model()

@@ -18,8 +18,10 @@ if __name__ == '__main__':
     t.start()
 
     import sys
+    import time
 
-    #create frontend instance
+    #create frontend instance after delay for database sync
+    time.sleep(3) # should be enough for initial sync, find another solution
     app = QApplication(sys.argv)
 
     invoiceGenerator = Controller()
