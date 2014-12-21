@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'clientDialog.ui'
 #
-# Created: Tue Jul 22 11:43:15 2014
+# Created: Fri Nov 14 11:14:42 2014
 #      by: PyQt5 UI code generator 5.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -48,11 +48,15 @@ class Ui_ClientDialog(object):
         self.buttonBox.accepted.connect(ClientDialog.accept)
         self.buttonBox.rejected.connect(ClientDialog.reject)
         QtCore.QMetaObject.connectSlotsByName(ClientDialog)
+        ClientDialog.setTabOrder(self.businessName, self.contactName)
+        ClientDialog.setTabOrder(self.contactName, self.address1)
+        ClientDialog.setTabOrder(self.address1, self.address2)
+        ClientDialog.setTabOrder(self.address2, self.buttonBox)
 
     def retranslateUi(self, ClientDialog):
         _translate = QtCore.QCoreApplication.translate
         ClientDialog.setWindowTitle(_translate("ClientDialog", "Client Details"))
-        self.label.setText(_translate("ClientDialog", "Company name"))
-        self.label_3.setText(_translate("ClientDialog", "Address"))
-        self.label_2.setText(_translate("ClientDialog", "Contact name"))
+        self.label.setText(_translate("ClientDialog", "Firmenname"))
+        self.label_3.setText(_translate("ClientDialog", "Adresse"))
+        self.label_2.setText(_translate("ClientDialog", "Kontaktname"))
 

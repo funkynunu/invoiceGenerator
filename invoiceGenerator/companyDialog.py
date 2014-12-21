@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'companyDialog.ui'
 #
-# Created: Tue Jul 22 10:11:28 2014
+# Created: Fri Nov 14 11:14:44 2014
 #      by: PyQt5 UI code generator 5.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -57,8 +57,8 @@ class Ui_CompanyDialog(object):
     def retranslateUi(self, CompanyDialog):
         _translate = QtCore.QCoreApplication.translate
         CompanyDialog.setWindowTitle(_translate("CompanyDialog", "Company Details"))
-        self.label.setText(_translate("CompanyDialog", "Bank name"))
-        self.label_2.setText(_translate("CompanyDialog", "Branch code"))
-        self.label_3.setText(_translate("CompanyDialog", "Customer number"))
-        self.label_4.setText(_translate("CompanyDialog", "Tax number"))
+        self.label.setText(_translate("CompanyDialog", "Bank"))
+        self.label_2.setText(_translate("CompanyDialog", "Bankleitzahl"))
+        self.label_3.setText(_translate("CompanyDialog", "Kundennummer"))
+        self.label_4.setText(_translate("CompanyDialog", "Steuernummer"))
 

@@ -10,10 +10,11 @@ from PyQt5.QtCore import QUrl, QObject, pyqtSlot
 
 # from iGHtmlController import HtmlController
 from iGModel import Model
-from iGUi import Ui_MainWindow
+#from iGUi import Ui_MainWindow
+from mainDialog import Ui_MainWindow
 
-from preferencesDialog import Ui_PreferencesDialog
-
+from preferencesDialog import Ui_Dialog
+#from preferencesDialog import Ui_Dialog
 from storeDialog import Ui_StoreDialog
 from clientDialog import Ui_ClientDialog
 from lineItemsDialog import Ui_LineItemsDialog
@@ -65,6 +66,7 @@ class Controller(QMainWindow):
         self.setCurrentView()
 
     def setPreview(self):
+        print("controller.setPreview")
         self.ui.webView.setHtml(self.model.getCurrentInvoice(), self.baseUrl)
 
     def configurePreferences(self):
@@ -72,7 +74,7 @@ class Controller(QMainWindow):
 #        preferenceDialog = Preferences(self)
 #        preferenceDialog.show()
         preferencesDialog = QDialog(self)
-        preferencesUi = Ui_PreferencesDialog()
+        preferencesUi = Ui_Dialog()
         preferencesUi.setupUi(preferencesDialog)
 
         # read preferences and set values in dialog
@@ -101,6 +103,28 @@ class Controller(QMainWindow):
             with open('preferences.pickle', 'wb') as f:
                 preferences = pickle.dump(preferences, f)
 
+    def invoiceNoChanged(self):
+        " check if text entered is old invoice no "
+        # if yes, get invoice and display, set view to previous
+        # of no, initialise invoice via reset
+        print("controller.invoiceNoChanged")
+        if self.model.previousInvoice(self.ui.currInvNo.text()) != None:
+            self.ui.webView.setHtml \
+                (self.model.getPreviewPreviousInvoice(self.ui.currInvNo.text()), self.baseUrl)
+            self.setPreviousView()
+        else:
+        # trying something
+        # initialize initial current invoice with invoice number
+            self.model.initializeCurrentInvoice()
+            self.model.currentInvoice.invoiceNo = self.ui.currInvNo.text()
+        # display current invoice
+            self.ui.webView.setHtml(self.model.getPreviewCurrentInvoice(),self.baseUrl)
+            self.setCurrentView()
+
+
+            #self.reset()
+
+
     def treeListSelected(self):
         print("controller.treeListSelected")
         # https://docs.python.org/3/library/re.html
@@ -126,6 +150,7 @@ class Controller(QMainWindow):
         self.setCurrentView()
         self.ui.currInvNo.setText(self.model.getCurrentInvoiceNo())
 
+
     def save(self):
         print("controller.save")
         self.model.saveCurrentInvoice()
@@ -137,7 +162,6 @@ class Controller(QMainWindow):
 
     def print(self):
         print("controller.print")
-        print(self.model.getCurrentInvoice().note)
         editor = self.ui.webView
         printer = QPrinter()
 
@@ -260,7 +284,7 @@ class Controller(QMainWindow):
         self.ui.clientsCb.setEnabled(False)
         self.ui.viewCurrentBtn.setEnabled(True)
         self.ui.setCurrentBtn.setEnabled(True)
-        
+
     """
     Turns required screen widgets on/off as needed when editing an invoice
     """
@@ -285,6 +309,7 @@ class Controller(QMainWindow):
     def displayStore1Dialog(self):
         # if 'ok' then update current invoice
         # and webview
+        print("controller.displayStore1Dialog")
         store1Dialog = QDialog(self)
         store1Ui = Ui_StoreDialog()
         store1Ui.setupUi(store1Dialog)
@@ -308,13 +333,14 @@ class Controller(QMainWindow):
             setattr(cInvoice.store1,"telNo",store1Ui.telNo.text())
             #self.model.getCurrentInvoice().store1.timestamp
 
-            self.view.webView.setHtml(self.model.getPreviewCurrentInvoice())
-            self.view.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
+            self.ui.webView.setHtml(self.model.getPreviewCurrentInvoice(), self.baseUrl)
+            self.ui.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
 
     @pyqtSlot()
     def displayStore2Dialog(self):
         # if 'ok' then update current invoice
         # and webview
+        print("controller.displayStore2Dialog")
         store2Dialog = QDialog(self)
         store2Ui = Ui_StoreDialog()
         store2Ui.setupUi(store2Dialog)
@@ -337,11 +363,12 @@ class Controller(QMainWindow):
             setattr(cInvoice.store2,"address2",store2Ui.address2.text())
             setattr(cInvoice.store2,"telNo",store2Ui.telNo.text())
 
-            self.view.webView.setHtml(self.model.getPreviewCurrentInvoice())
-            self.view.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
+            self.ui.webView.setHtml(self.model.getPreviewCurrentInvoice(), self.baseUrl)
+            self.ui.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
 
     @pyqtSlot()
     def displayClientDialog(self):
+        print("controller.displayClientDialog")
         clientDialog = QDialog(self)
         clientUi = Ui_ClientDialog()
         clientUi.setupUi(clientDialog)
@@ -362,11 +389,12 @@ class Controller(QMainWindow):
             setattr(cInvoice.client,"address1",clientUi.address1.text())
             setattr(cInvoice.client,"address2",clientUi.address2.text())
 
-            self.view.webView.setHtml(self.model.getPreviewCurrentInvoice())
-            self.view.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
+            self.ui.webView.setHtml(self.model.getPreviewCurrentInvoice(), self.baseUrl)
+            self.ui.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
 
     @pyqtSlot()
     def displayLineItemsDialog(self):
+        print("controller.displayLineItemsDialog")
         lineItemsDialog = QDialog(self)
         lineItemsUi = Ui_LineItemsDialog()
         lineItemsUi.setupUi(lineItemsDialog)
@@ -752,11 +780,12 @@ class Controller(QMainWindow):
             #setattr(cInvoice, "lineItems", lineItems)
             cInvoice.setLineItems(lineItems)
 
-            self.view.webView.setHtml(self.model.getPreviewCurrentInvoice())
-            self.view.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
+            self.ui.webView.setHtml(self.model.getPreviewCurrentInvoice(), self.baseUrl)
+            self.ui.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
 
     @pyqtSlot()
     def displayCompanyDialog(self):
+        print("controller.displayCompanyDialog")
         companyDialog = QDialog(self)
         companyUi = Ui_CompanyDialog()
         companyUi.setupUi(companyDialog)
@@ -772,10 +801,10 @@ class Controller(QMainWindow):
         # if dialog is displayed
         if companyDialog.exec_():
             #extract values from dialog and change current invoice
-            self.model.getCurrentInvoice().company.setBankName = companyUi.bankName.text()
-            self.model.getCurrentInvoice().company.setBranchCode = companyUi.branchCode.text()
-            self.model.getCurrentInvoice().company.setTaxNo = companyUi.taxNo.text()
-            self.model.getCurrentInvoice().company.setCustomerNo = companyUi.customerNo.text()
+            self.model.getCurrentInvoice().company.bankName = companyUi.bankName.text()
+            self.model.getCurrentInvoice().company.branchCode = companyUi.branchCode.text()
+            self.model.getCurrentInvoice().company.taxNo = companyUi.taxNo.text()
+            self.model.getCurrentInvoice().company.customerNo = companyUi.customerNo.text()
 
-            self.view.webView.setHtml(self.model.getPreviewCurrentInvoice())
-            self.view.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)
+            self.ui.webView.setHtml(self.model.getPreviewCurrentInvoice(), self.baseUrl)
+            self.ui.webView.page().mainFrame().addToJavaScriptWindowObject("controller", self)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lineItemsDialog.ui'
 #
-# Created: Sat Jul 26 12:43:12 2014
+# Created: Fri Nov 14 11:14:46 2014
 #      by: PyQt5 UI code generator 5.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -272,13 +272,13 @@ class Ui_LineItemsDialog(object):
     def retranslateUi(self, LineItemsDialog):
         _translate = QtCore.QCoreApplication.translate
         LineItemsDialog.setWindowTitle(_translate("LineItemsDialog", "Line items"))
-        self.label.setText(_translate("LineItemsDialog", "Note"))
-        self.label_2.setText(_translate("LineItemsDialog", "Quantity"))
-        self.label_3.setText(_translate("LineItemsDialog", "Description"))
-        self.label_4.setText(_translate("LineItemsDialog", "Price"))
-        self.label_5.setText(_translate("LineItemsDialog", "Tax Rate"))
-        self.label_7.setText(_translate("LineItemsDialog", "Vat"))
-        self.label_6.setText(_translate("LineItemsDialog", "Total"))
+        self.label.setText(_translate("LineItemsDialog", "Text"))
+        self.label_2.setText(_translate("LineItemsDialog", "Menge"))
+        self.label_3.setText(_translate("LineItemsDialog", "Beschreibung"))
+        self.label_4.setText(_translate("LineItemsDialog", "Preis"))
+        self.label_5.setText(_translate("LineItemsDialog", "MwSt Satz"))
+        self.label_7.setText(_translate("LineItemsDialog", "MwSt"))
+        self.label_6.setText(_translate("LineItemsDialog", "Gesamtbetrag"))
         self.vatCategory1.setItemText(0, _translate("LineItemsDialog", "7%"))
         self.vatCategory1.setItemText(1, _translate("LineItemsDialog", "19%"))
         self.vatCategory2.setItemText(0, _translate("LineItemsDialog", "7%"))

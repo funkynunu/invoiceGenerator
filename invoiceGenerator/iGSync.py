@@ -1,5 +1,5 @@
 import time
-from iGDb import SQLiteDb
+from iGSQLiteDb import SQLiteDb
 from iGPSQLDb import PostgreSQLDb
 import pickle
 
@@ -98,5 +98,5 @@ class Sync:
 
                 #after each invoice inserted
 
-            time.sleep(20)
+            time.sleep(60)
         print(arg)

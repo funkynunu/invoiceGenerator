@@ -85,7 +85,7 @@ class LineItem(object):
         return format(float(self.vatAmount), '0.2f')
 
 class Client(object):
-    def __init__(self, clientId, contactName, businessName, address1, address2):#, timestamp):
+    def __init__(self, clientId = "", contactName = "", businessName = "", address1 = "", address2 = ""):#, timestamp):
         self.clientId = clientId
         self.contactName = contactName
         self.businessName = businessName
@@ -93,8 +93,7 @@ class Client(object):
         self.address2 = address2
 
 class Company(object):
-    def __init__(self, companyId, bankName, branchCode, taxNo, customerNo):
-
+    def __init__(self, companyId = "", bankName = "", branchCode = "", taxNo = "", customerNo = ""):
         self.companyId = companyId
         self.bankName = bankName
         self.branchCode = branchCode
@@ -102,7 +101,7 @@ class Company(object):
         self.customerNo = customerNo
 
 class Store(object):
-    def __init__(self, storeId, companyId, name, manager, address1, address2, telNo):
+    def __init__(self, storeId = "", companyId = "", name = "", manager = "", address1 = "", address2 = "", telNo = ""):
         self.storeId = storeId
         self.companyId = companyId
         self.name = name

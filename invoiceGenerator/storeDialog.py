@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'storeDialog.ui'
 #
-# Created: Sat Jul 26 12:42:59 2014
+# Created: Fri Nov 14 11:14:51 2014
 #      by: PyQt5 UI code generator 5.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,10 +47,6 @@ class Ui_StoreDialog(object):
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 5, 0, 1, 2)
-        self.label.setBuddy(self.name)
-        self.label_2.setBuddy(self.manager)
-        self.label_3.setBuddy(self.address1)
-        self.label_4.setBuddy(self.telNo)
 
         self.retranslateUi(StoreDialog)
         self.buttonBox.accepted.connect(StoreDialog.accept)
@@ -59,9 +55,9 @@ class Ui_StoreDialog(object):
 
     def retranslateUi(self, StoreDialog):
         _translate = QtCore.QCoreApplication.translate
-        StoreDialog.setWindowTitle(_translate("StoreDialog", "Store details"))
-        self.label.setText(_translate("StoreDialog", "Store name"))
-        self.label_2.setText(_translate("StoreDialog", "Store manager"))
-        self.label_3.setText(_translate("StoreDialog", "Address"))
-        self.label_4.setText(_translate("StoreDialog", "Telephone"))
+        StoreDialog.setWindowTitle(_translate("StoreDialog", "Dialog"))
+        self.label.setText(_translate("StoreDialog", "Filiale"))
+        self.label_2.setText(_translate("StoreDialog", "Inhaber"))
+        self.label_3.setText(_translate("StoreDialog", "Adresse"))
+        self.label_4.setText(_translate("StoreDialog", "Telefon"))
 
